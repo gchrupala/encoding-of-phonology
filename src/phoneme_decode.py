@@ -17,7 +17,7 @@ data = [ json.loads(line) for line in open("../data/coco/dataset.val.fa.json")]
 
 # In[3]:
 
-import imaginet.vendrov_provider as dp
+import imaginet.data_provider as dp #FIXME #FIXME change to vendrov and make sure it still works.
 import imaginet.defn.audiovis_rhn as audiovis
 
 
@@ -43,7 +43,7 @@ def phones(utt):
             pos = end
             label = phone['phone'].split('_')[0]
             if label != 'oov':
-                yield (label, int(start*1000), int(end*1000)) 
+                yield (label, int(start*1000), int(end*1000))
 
 
 # In[7]:
@@ -76,7 +76,7 @@ from sklearn.decomposition import PCA
 # In[ ]:
 
 logging.info("Extracting MFCC examples")
-data_filter = [ (utt, sent) for (utt, sent) in zip(data, val) 
+data_filter = [ (utt, sent) for (utt, sent) in zip(data, val)
                if numpy.all([word.get('start', False) for word in utt['words']]) ]
 data_filter = data_filter[:5000]
 data_state =  [phoneme for (utt, sent) in data_filter for phoneme in slices(utt, sent['audio']) ]
@@ -165,4 +165,3 @@ for layer in range(0,5):
     pickle.dump(model, open("lr_{}.pkl".format(label), 'w'))
     numpy.save('lr_{}_pred.npy'.format(label), numpy.vstack([y_val, pred]).T)
     print(label, accuracy_score(y_val, pred))
-

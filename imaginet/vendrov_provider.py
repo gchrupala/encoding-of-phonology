@@ -23,6 +23,7 @@ class Provider:
     audio_path = "{}/data/{}/dataset.{}.npy".format(self.root, self.dataset, self.audio_kind)
     ipa_path   = "{}/data/{}/dataset.ipa.jsonl.gz".format(self.root, self.dataset)
     words = json.load(open("{}/data/{}/dataset.words.json".format(self.root, self.dataset)))
+    self.idmap = json.load(open("{}/data/{}/dataset.idmap.json".format(self.root, self.dataset)))
     self.w2i = {}
     for i in range(0, len(words)):
         self.w2i[words[i]] = i
@@ -53,6 +54,7 @@ class Provider:
         sent['tokens'] = self.txt[split][i*5+j]
         sent['raw'] = ' '.join(sent['tokens'])
         sent['imgid'] = i
+        sent['sentid'] = self.idmap[split][str(i)][str(j)]
         if self.audio_kind is None:
             sent['audio'] = None
         else:

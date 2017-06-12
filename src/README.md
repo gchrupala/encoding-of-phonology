@@ -4,6 +4,16 @@
 
 ### Figure 1
 
+Compute results:
+```
+python2.7 analyze.py decoding
+```
+
+Generate plot:
+```
+Rscript phoneme_decode.R
+```
+
 ## 5.2 Phoneme discrimination
 
 ### Table 3

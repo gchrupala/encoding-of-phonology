@@ -18,8 +18,13 @@ def main():
 
 
 def decoding(args):
+    logging.info("Decoding")
     from phoneme_decode import decode
     decode()
+    logging.info("Bootstrapping")
+    from bootstrap import bootstrap
+    bootstrap()
+
 
 def abx(args):
     raise NotImplementedError
@@ -28,7 +33,15 @@ def clustering(args):
     raise NotImplementedError
 
 def synonyms(args):
-    raise NotImplementedError
+    from activations import activations
+    texts = [ line.strip() for line in open("synonym_sentences.txt")]
+    result = activations(texts, "../models/coco-speech.zip", audio_dir="../data/coco/synonym/")
+    numpy.save("mfcc.npy", result['mfcc'])
+    numpy.save("states.npy", result['layer_states'])
+    numpy.save("embeddings.npy", result['embeddings'])
+    numpy.save("conv_states.npy", result['conv_states'])
+    from synonyms import synonyms
+    synonyms()
 
 
 if __name__ == '__main__':

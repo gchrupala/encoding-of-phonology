@@ -33,9 +33,10 @@ def clustering(args):
     raise NotImplementedError
 
 def synonyms(args):
-    from activations import activations
+    from activations import activations, audio
     texts = [ line.strip() for line in open("synonym_sentences.txt")]
-    result = activations(texts, "../models/coco-speech.zip", audio_dir="../data/coco/synonym/")
+    audios = audio(texts, "../data/coco/synonym/")
+    result = activations(audios, "../models/coco-speech.zip")
     numpy.save("mfcc.npy", result['mfcc'])
     numpy.save("states.npy", result['layer_states'])
     numpy.save("embeddings.npy", result['embeddings'])

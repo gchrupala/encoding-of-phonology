@@ -8,6 +8,16 @@ import logging
 import os
 import requests
 import time
+import errno
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
 
 def synthesize(text, path=None, trial=1):
     try:
@@ -20,25 +30,26 @@ def synthesize(text, path=None, trial=1):
             time.sleep(5)
             return synthesize(text, path=path, trial=trial+1)
 
-def activations(texts, model_path,  audio_dir=None):
-    """Return layer states and embeddings for sentences in texts, by synthesizing speech
-       for each text, extracting MFCC features and applying a speech model to them.
+def make_audio(texts, audio_dir):
+    """Synthesize and store audio in audio_dir.
+    """
+    logging.info("Synthesizing speech")
+    mkdir_p(audio_dir)
+    audios = (synthesize(text) for text in texts)
+    logging.info("Storing wav files")
+    for i, audio in enumerate(audios):
+        with open("{}/{}.wav".format(audio_dir, i), 'w') as out:
+            out.write(audio)
+
+def activations(audios, model_path):
+    """Return layer states and embeddings for sentences in audios,
+    extracting MFCC features and applying a speech model to them.
     """
     logging.info("Loading model")
     model = task.load(model_path)
-    logging.info("Synthesizing speech")
-    audios = [ synthesize(text) for text in texts ]
-    if audio_dir is not None:
-        try:
-            os.makedirs(audio_dir)
-        except OSError:
-            pass
-        logging.info("Storing wav files")
-        for i, audio in enumerate(audios):
-            with open("{}/{}.wav".format(audio_dir, i), 'w') as out:
-                out.write(audio)
+
     logging.info("Extracting MFCC features")
-    mfccs  = [ tts.extract_mfcc(audio) for audio in audios]
+    mfccs  = [ tts.extract_mfcc(au) for au in audios]
     logging.info("Extracting convolutional states")
     conv_states = audiovis.conv_states(model, mfccs)
     logging.info("Extracting layer states")
@@ -47,6 +58,13 @@ def activations(texts, model_path,  audio_dir=None):
     embeddings = audiovis.encode_sentences(model, mfccs)
     return {'mfcc': mfccs, 'conv_states': conv_states, 'layer_states': states, 'embeddings': embeddings}
 
+def audio(texts, audio_dir):
+    """Load audio from audio_dir.
+    """
+    logging.info("Loading audio")
+    for i in range(len(texts)):
+        with open("{}/{}.wav".format(audio_dir, i), "rb") as au:
+            yield au.read()
 
 def main():
     logging.getLogger().setLevel('INFO')
@@ -64,11 +82,16 @@ def main():
                             help='Path to file where state of convolutional layer will be stored')
     parser.add_argument('--embeddings', default='embeddings.npy',
                             help='Path to file where sentence embeddings will be stored')
-    parser.add_argument('--audio_dir', default=None,
-                            help='Path to directory where audio will be stored')
+    parser.add_argument('--audio_dir', default="/tmp",
+                            help='Path to directory where audio is stored')
+    parser.add_argument('--synthesize', action='store_true', default=False,
+                            help='Should audio be synthesized')
     args = parser.parse_args()
     texts = [ line.strip() for line in open(args.texts)]
-    result = activations(texts, args.model, audio_dir=args.audio_dir)
+    if args.synthesize:
+        make_audio(texts, args.audio_dir)
+    audios = audio(texts, args.audio_dir)
+    result = activations(audios, args.model)
     numpy.save(args.mfcc, result['mfcc'])
     numpy.save(args.layer_states, result['layer_states'])
     numpy.save(args.embeddings, result['embeddings'])

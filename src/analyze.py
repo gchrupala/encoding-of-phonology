@@ -25,7 +25,6 @@ def decoding(args):
     from bootstrap import bootstrap
     bootstrap()
 
-
 def abx(args):
     raise NotImplementedError
 
@@ -33,14 +32,12 @@ def clustering(args):
     raise NotImplementedError
 
 def synonyms(args):
-    from activations import activations, audio
+    from activations import save_activations
+    from audio import load_audio
     texts = [ line.strip() for line in open("synonym_sentences.txt")]
-    audios = audio(texts, "../data/coco/synonym/")
-    result = activations(audios, "../models/coco-speech.zip")
-    numpy.save("mfcc.npy", result['mfcc'])
-    numpy.save("states.npy", result['layer_states'])
-    numpy.save("embeddings.npy", result['embeddings'])
-    numpy.save("conv_states.npy", result['conv_states'])
+    audios = load_audio(texts, "../data/coco/synonym/")
+    save_activations(audios, "../models/coco-speech.zip",
+        "mfcc.npy", "conv_states.npy", "states.npy", "embeddings.npy")
     from synonyms import synonyms
     synonyms()
 

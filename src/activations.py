@@ -5,41 +5,8 @@ import imaginet.tts as tts
 import sys
 import argparse
 import logging
-import os
-import requests
-import time
-import errno
+import audio
 
-def mkdir_p(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:  # Python >2.5
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
-
-def synthesize(text, path=None, trial=1):
-    try:
-        return tts.decodemp3(tts.speak(text))
-    except requests.exceptions.HTTPError:
-        if trial > 10:
-            raise RuntimeError("HTTPError: giving up after 10 trials")
-        else:
-            logging.info("HTTPError, waiting for 5 sec")
-            time.sleep(5)
-            return synthesize(text, path=path, trial=trial+1)
-
-def make_audio(texts, audio_dir):
-    """Synthesize and store audio in audio_dir.
-    """
-    logging.info("Synthesizing speech")
-    mkdir_p(audio_dir)
-    audios = (synthesize(text) for text in texts)
-    logging.info("Storing wav files")
-    for i, audio in enumerate(audios):
-        with open("{}/{}.wav".format(audio_dir, i), 'w') as out:
-            out.write(audio)
 
 def activations(audios, model_path):
     """Return layer states and embeddings for sentences in audios,
@@ -58,13 +25,22 @@ def activations(audios, model_path):
     embeddings = audiovis.encode_sentences(model, mfccs)
     return {'mfcc': mfccs, 'conv_states': conv_states, 'layer_states': states, 'embeddings': embeddings}
 
-def audio(texts, audio_dir):
-    """Load audio from audio_dir.
+def save_activations(audios, model_path, mfcc_path, conv_path, states_path, emb_path):
+    """Return layer states and embeddings for sentences in audios,
+    extracting MFCC features and applying a speech model to them.
     """
-    logging.info("Loading audio")
-    for i in range(len(texts)):
-        with open("{}/{}.wav".format(audio_dir, i), "rb") as au:
-            yield au.read()
+    logging.info("Loading model")
+    model = task.load(model_path)
+    audios = list(audios)
+    logging.info("Extracting MFCC features")
+    mfccs  = [ tts.extract_mfcc(au) for au in audios]
+    numpy.save(mfcc_path, mfccs)
+    logging.info("Extracting convolutional states")
+    numpy.save(conv_path, audiovis.conv_states(model, mfccs))
+    logging.info("Extracting layer states")
+    numpy.save(states_path, audiovis.layer_states(model, mfccs))
+    logging.info("Extracting sentence embeddings")
+    numpy.save(emb_path, audiovis.encode_sentences(model, mfccs))
 
 def main():
     logging.getLogger().setLevel('INFO')
@@ -89,13 +65,10 @@ def main():
     args = parser.parse_args()
     texts = [ line.strip() for line in open(args.texts)]
     if args.synthesize:
-        make_audio(texts, args.audio_dir)
-    audios = audio(texts, args.audio_dir)
-    result = activations(audios, args.model)
-    numpy.save(args.mfcc, result['mfcc'])
-    numpy.save(args.layer_states, result['layer_states'])
-    numpy.save(args.embeddings, result['embeddings'])
-    numpy.save(args.conv_states, result['conv_states'])
+        audio.save_audio(texts, args.audio_dir)
+    audios = audio.load_audio(texts, args.audio_dir)
+    save_activations(audios, args.model,
+        args.mfcc, args.conv_states, args.layer_states, args.embeddings)
 
 
 if __name__=='__main__':

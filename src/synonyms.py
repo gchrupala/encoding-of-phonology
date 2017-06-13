@@ -91,11 +91,11 @@ def synonyms():
         out.write("Representation Pair Error\n")
         #Activations per layer
         logging.info("Loading states")
-        states = numpy.load('states.npy')
-        states_synonyms = split_into_pairs(states)
+        act = numpy.load('states.npy')
+
 
         i=0
-        for k, synonympair in enumerate(states_synonyms):
+        for k, synonympair in enumerate(split_into_pairs(act)):
             logging.info("Synonym pair {}".format(pairs[k]))
             for layer in range(5):
                 labels= create_labels(synonympair)
@@ -108,11 +108,10 @@ def synonyms():
 
         # #MFCC
         logging.info("Loading MFCC")
-        MFCC = numpy.load('mfcc.npy')
-        MFCC_synonyms = split_into_pairs(MFCC)
+        act = numpy.load('mfcc.npy')
 
         i=0
-        for k, synonympair in enumerate(MFCC_synonyms):
+        for k, synonympair in enumerate(split_into_pairs(act)):
             logging.info("Synonym pair {}".format(pairs[k]))
             labels = create_labels(synonympair)
             data = timewise_average(synonympair)
@@ -122,11 +121,10 @@ def synonyms():
             out.write("mfcc {} {}\n".format(pairs[k], error))
 
         logging.info("Loading Convo")
-        rep = numpy.load('conv_states.npy')
-        rep_synonyms = split_into_pairs(rep)
+        act = numpy.load('conv_states.npy')
 
         i=0
-        for k, synonympair in enumerate(rep_synonyms):
+        for k, synonympair in enumerate(split_into_pairs(act)):
             logging.info("Synonym pair {}".format(pairs[k]))
             labels = create_labels(synonympair)
             data = timewise_average(synonympair)
@@ -138,12 +136,9 @@ def synonyms():
 
         #Embeddings
         logging.info("Loading embeddings")
-        embeddings = numpy.load('embeddings.npy')
-        print embeddings[0].shape
-        embeddings_synonyms = split_into_pairs(embeddings)
-
+        act = numpy.load('embeddings.npy')
         i=0
-        for k, synonympair in enumerate(embeddings_synonyms):
+        for k, synonympair in enumerate(split_into_pairs(act)):
             logging.info("Synonym pair {}".format(pairs[k]))
             labels = create_labels(synonympair)
             data = synonympair

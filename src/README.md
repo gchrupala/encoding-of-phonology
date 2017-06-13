@@ -32,4 +32,16 @@ Rscript phoneme_decode.R
 
 ### Figure 5
 
+Results:
+
+```
+python2.7 analyze.py synonyms
+```
+Figure:
+```
+Rscript synonyms.R
+```
+
+
+
 

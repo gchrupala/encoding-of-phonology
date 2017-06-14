@@ -1,7 +1,7 @@
 import numpy
 import imaginet.task as task
 import imaginet.defn.audiovis_rhn as audiovis
-import imaginet.tts as tts
+from audio import extract_mfcc
 import sys
 import argparse
 import logging
@@ -16,7 +16,7 @@ def activations(audios, model_path):
     model = task.load(model_path)
 
     logging.info("Extracting MFCC features")
-    mfccs  = [ tts.extract_mfcc(au) for au in audios]
+    mfccs  = [ extract_mfcc(au) for au in audios]
     logging.info("Extracting convolutional states")
     conv_states = audiovis.conv_states(model, mfccs)
     logging.info("Extracting layer states")
@@ -33,7 +33,7 @@ def save_activations(audios, model_path, mfcc_path, conv_path, states_path, emb_
     model = task.load(model_path)
     audios = list(audios)
     logging.info("Extracting MFCC features")
-    mfccs  = [ tts.extract_mfcc(au) for au in audios]
+    mfccs  = [ extract_mfcc(au) for au in audios]
     numpy.save(mfcc_path, mfccs)
     logging.info("Extracting convolutional states")
     numpy.save(conv_path, audiovis.conv_states(model, mfccs))

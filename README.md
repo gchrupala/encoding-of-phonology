@@ -21,3 +21,4 @@ After unpacking these files you should have the directories `data` and `models`.
 
 ## Usage
 
+See [src/README.md](src/README.md)

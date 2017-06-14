@@ -14,9 +14,8 @@ Second, install the code in the current repo:
     python setup.py develop
 
 You also need to download and unpack the files `data.tgz` and `models.tgz` from http://doi.org/10.5281/zenodo.804392.
-The files in `models.tgz` contain the pre-trained model used for the analyses in the paper.
-
-After unpacking these files you should have the directories `data` and `models`.
+After unpacking these files you should have the directories `data` and `models`. 
+The pre-trained model used for the analyses in the paper will be in `models/coco-speech.zip`.
 
 
 ## Usage

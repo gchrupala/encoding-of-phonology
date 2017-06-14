@@ -18,7 +18,25 @@ Rscript phoneme_decode.R
 
 ### Table 3
 
+Compute results:
+```
+python2.7 analyze.py abx-all
+```
+Results will be written in a file called abx-all.csv.
+
+
 ### Figure 2
+
+Compute results:
+```
+python2.7 analyze.py abx-classes
+```
+
+Generate plot:
+```
+Rscript ???.R
+```
+
 
 ## 5.3 Organization of phonemes
 

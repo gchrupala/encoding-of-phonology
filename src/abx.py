@@ -51,7 +51,7 @@ def abx_all():
     save_activations(audios, "../models/coco-speech.zip", datadir+"abx-mfcc.npy", datadir+"abx-conv_states.npy", \
                      datadir+"abx-states.npy", datadir+"abx-embeddings.npy")
 
-    out = open("abx-all.txt", 'w')
+    out = open("abx-all.csv", 'w')
 
     f = dict(zip(syllables, [extract_mfcc(a) for a in audios]))
     diff = [distance(audiovec(a,f),audiovec(x,f)) - distance(audiovec(b,f),audiovec(x,f)) for (a,b,x) in items]
@@ -113,17 +113,15 @@ def getClasses():
         lines = list(open('phonemes.txt'))[1:]
         gold_classes = []
         phoneme_classes = {}
-        ipa = {}
 
         for line in lines:
                 cols = line.strip().split('\t')
                 if cols[2] not in gold_classes: gold_classes.append(cols[2])
-                phoneme_classes[cols[0]] = gold_classes.index(cols[2])
-                ipa[cols[0]] = cols[1]
-        return phoneme_classes,gold_classes,ipa
+                phoneme_classes[cols[1]] = gold_classes.index(cols[2])
+        return phoneme_classes,gold_classes
 
 def abx_classes():
-        phoneme_classes,gold_classes,ipa = getClasses()
+        phoneme_classes,gold_classes = getClasses()
         lines = [line.strip() for line in open("abx_cv.txt")][1:]
         words = [l.split()[-1] for l in lines if l[0] != '#']
         syllables = [l.lower().split()[0]+'_'+l.lower().split()[1] for l in lines if l[0] != '#']
@@ -136,17 +134,17 @@ def abx_classes():
         
         out = open("abx-classes.csv", 'w')
         
-        out.write("Phoneme class,"+(''.join("%s\t"%c for c in gold_classes)))
+        out.write("Phoneme class,"+(''.join("%s,"%c for c in gold_classes))+'\n')
 
         f = dict(zip(syllables, [extract_mfcc(a) for a in audios]))
         diff = [distance(audiovec(a,f),audiovec(x,f)) - distance(audiovec(b,f),audiovec(x,f)) for (a,b,x) in items]
         accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
-        out.write("mfcc,"+(''.join("%2.2f\t"%accuracies[c] for c in range(len(gold_classes)))))
+        out.write("mfcc,"+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
 
         f = dict(zip(syllables,numpy.load(datadir+"abx-conv_states.npy")))
         diff = [distance(convvec(a,f),convvec(x,f)) - distance(convvec(b,f),convvec(x,f)) for (a,b,x) in items]
         accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
-        out.write("convolution,"+(''.join("%2.2f\t"%accuracies[c] for c in range(len(gold_classes)))))
+        out.write("convolution,"+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
 
         f = numpy.load(datadir+"abx-states.npy")
         layers = len(f[0][0])
@@ -154,12 +152,12 @@ def abx_classes():
         for l in range(layers):
                 diff = [distance(layervec(a,l,f),layervec(x,l,f)) - distance(layervec(b,l,f),layervec(x,l,f)) for (a,b,x) in items]
                 accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
-                out.write("recurrent %d,"%l+(''.join("%2.2f\t"%accuracies[c] for c in range(len(gold_classes)))))
+                out.write("recurrent %d,"%l+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
 
         f = dict(zip(syllables,numpy.load(datadir+"abx-embeddings.npy")))
         diff = [distance(embvec(a,f),embvec(x,f)) - distance(embvec(b,f),embvec(x,f)) for (a,b,x) in items]
         accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
-        out.write("embeddings,"+(''.join("%2.2f\t"%accuracies[c] for c in range(len(gold_classes)))))
+        out.write("embeddings,"+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
                     
         out.close()
                                                                                                                                                         

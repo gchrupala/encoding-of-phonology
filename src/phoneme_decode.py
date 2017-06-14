@@ -44,7 +44,7 @@ def decode():
 
 
     logging.info("Loading audio features")
-    prov = dp.getDataProvider('coco', root='..', audio_kind='mfcc')
+    prov = dp.getDataProvider('coco', root='..', audio_kind='mfcc', load_img=False)
 
     val = list(prov.iterSentences(split='val'))
 

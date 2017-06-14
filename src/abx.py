@@ -127,6 +127,8 @@ def abx_classes():
         syllables = [l.lower().split()[0]+'_'+l.lower().split()[1] for l in lines if l[0] != '#']
         all_syllables = Set(syllables)
         items = prepareItems(all_syllables)
+        numpy.save(open('abx_items.npy','wb'), items)
+
         
         audios = list(load_audio(words, datadir+"abx_cv/"))
         save_activations(audios, "../models/coco-speech.zip", datadir+"abx-mfcc.npy", datadir+"abx-conv_states.npy", \
@@ -138,11 +140,13 @@ def abx_classes():
 
         f = dict(zip(syllables, [extract_mfcc(a) for a in audios]))
         diff = [distance(audiovec(a,f),audiovec(x,f)) - distance(audiovec(b,f),audiovec(x,f)) for (a,b,x) in items]
+        numpy.save(open('abx_audio.npy', 'wb'), diff)
         accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
         out.write("mfcc,"+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
 
         f = dict(zip(syllables,numpy.load(datadir+"abx-conv_states.npy")))
         diff = [distance(convvec(a,f),convvec(x,f)) - distance(convvec(b,f),convvec(x,f)) for (a,b,x) in items]
+        numpy.save(open('abx_convolution.npy', 'wb'), diff)
         accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
         out.write("convolution,"+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
 
@@ -151,11 +155,13 @@ def abx_classes():
         f = dict(zip(syllables, f))
         for l in range(layers):
                 diff = [distance(layervec(a,l,f),layervec(x,l,f)) - distance(layervec(b,l,f),layervec(x,l,f)) for (a,b,x) in items]
+                numpy.save(open('abx_activations'+str(l)+'.npy', 'wb'), diff)                    
                 accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
                 out.write("recurrent %d,"%l+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
 
         f = dict(zip(syllables,numpy.load(datadir+"abx-embeddings.npy")))
         diff = [distance(embvec(a,f),embvec(x,f)) - distance(embvec(b,f),embvec(x,f)) for (a,b,x) in items]
+        numpy.save(open('abx_embeddings.npy', 'wb'), diff)
         accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
         out.write("embeddings,"+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
                     

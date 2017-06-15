@@ -167,7 +167,7 @@ def phoneme_clustering():
 
     for l in range(layers):
         cl = cluster(pactivations[l], n_clusters)
-        pickle.dump(cl, open('phoneme_cluster_rec%d.pkl'%i, 'wb'))
+        pickle.dump(cl, open('phoneme_cluster_rec%d.pkl'%l, 'wb'))
         out.write("rec%d %2.2f\n"%(l,metrics.adjusted_rand_score(truth_labels, cl.labels_)))
     out.close()
     pickle.dump(phones, open('phoneme_cluster_keys.pkl','wb'))

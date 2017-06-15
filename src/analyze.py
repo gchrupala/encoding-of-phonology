@@ -68,17 +68,13 @@ def dendro(args):
 
     from sklearn.cluster import AgglomerativeClustering
     phones = pickle.load(open("phoneme_cluster_keys.pkl"))
-    print(phones)
-   # phones = list(zzz)
     phoneme_cluster = pickle.load(open("phoneme_cluster_rec0.pkl"))
     lines = list(open('phonemes.txt'))[1:]
     ipa = {}
     for line in lines:
         cols = line.strip().split('\t')
         ipa[cols[0]] = cols[1].decode('utf8')
-    print(" ".join(phones))
     labels = [ipa[phones[x]] for x in range(len(phones))]
-    print(" ".join(labels))
     plt.figure(figsize=(16,8))
     plt.rc('font', family='DejaVu Sans')
     plt.yticks([])

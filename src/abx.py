@@ -186,7 +186,7 @@ def abx_cv_scores():
         rec3 = numpy.load("abx_cv_activations2.npy"),
         rec4 = numpy.load("abx_cv_activations3.npy"),
         rec5 = numpy.load("abx_cv_activations4.npy")
-        # ,emb  = numpy.load("abx_cv_embeddings.npy")
+        ,emb  = numpy.load("abx_cv_embeddings.npy")
         )
     with open("abx_cv_scores.txt",'w') as out:
         out.write("repr ac av bc bv xc xv target distractor target_c distractor_c score\n")

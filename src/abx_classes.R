@@ -3,7 +3,7 @@ library(ggplot2)
 
 abx <- read.table("abx_cv_scores.txt", header=TRUE) %>% 
   mutate(correct = score >= 0,
-         repr=factor(repr, levels=c("mfcc","conv","rec1","rec2","rec3","rec4","rec5"))) %>%
+         repr=factor(repr, levels=c("mfcc","conv","rec1","rec2","rec3","rec4","rec5","emb"))) %>%
   rename(Representation=repr)
 
 

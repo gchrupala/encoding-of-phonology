@@ -13,6 +13,7 @@ def main():
     commands.add_parser('abx_classes').set_defaults(func=abx_classes)
     commands.add_parser('clustering').set_defaults(func=clustering)
     commands.add_parser('synonyms').set_defaults(func=synonyms)
+    commands.add_parser('dendro').set_defaults(func=dendro)
 
     args = parser.parse_args()
     args.func(args)
@@ -49,6 +50,52 @@ def synonyms(args):
         "mfcc.npy", "conv_states.npy", "states.npy", "embeddings.npy")
     from synonyms import synonyms
     synonyms()
+
+def dendro(args):
+    import cPickle as pickle
+    import numpy as np
+    import matplotlib
+    matplotlib.use('Agg')
+    from matplotlib import pyplot as plt
+
+    from sklearn.cluster import AgglomerativeClustering
+    phones = pickle.load(open("phoneme_cluster_keys.pkl"))
+    print(phones)
+   # phones = list(zzz)
+    phoneme_cluster = pickle.load(open("phoneme_cluster_rec0.pkl"))
+    lines = list(open('phonemes.txt'))[1:]
+    ipa = {}
+    for line in lines:
+        cols = line.strip().split('\t')
+        ipa[cols[0]] = cols[1].decode('utf8')
+    print(" ".join(phones))
+    labels = [ipa[phones[x]] for x in range(len(phones))]
+    print(" ".join(labels))
+    plt.figure(figsize=(16,8))
+    plt.rc('font', family='DejaVu Sans')
+    plt.yticks([])
+    plot_dendrogram(phoneme_cluster, labels=labels, leaf_font_size=16, truncate_mode=None, show_contracted=False,
+                link_color_func=lambda k: 'black')
+    plt.savefig('../figures/dendro.pdf')
+
+def plot_dendrogram(model, **kwargs):
+    import numpy as np
+    from scipy.cluster.hierarchy import dendrogram
+    # Children of hierarchical clustering
+    children = model.children_
+
+    # Distances between each pair of children
+    # Since we don't have this information, we can use a uniform one for plotting
+    distance = np.arange(children.shape[0])
+
+    # The number of observations contained in each cluster level
+    no_of_observations = np.arange(2, children.shape[0]+2)
+
+    # Create linkage matrix and then plot the dendrogram
+    linkage_matrix = np.column_stack([children, distance, no_of_observations]).astype(float)
+
+    # Plot the corresponding dendrogram
+    dendrogram(linkage_matrix, color_threshold=0, **kwargs)
 
 
 if __name__ == '__main__':

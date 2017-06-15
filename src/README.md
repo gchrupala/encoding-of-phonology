@@ -42,9 +42,26 @@ Rscript abx_classes.R
 
 ### Figure 3
 
-### Figure 4
+Results:
+```
+python2.7 analyze.py correlation
+```
+Figure:
+```
+Rscript correlation.R
+```
 
-### Figure 5
+### Figure 4 and Figure 5
+
+Results
+```
+python2.7 analyze.py clustering
+```
+
+```
+Rscript randindex.R
+python2.7 analyze.py dendro
+```
 
 ## 5.4 Synonym discrimination
 

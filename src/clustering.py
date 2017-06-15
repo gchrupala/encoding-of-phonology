@@ -9,6 +9,7 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn import metrics
 from scipy.spatial.distance import euclidean
 import cPickle as pickle
+from sets import Set
 
 layers = 5
 

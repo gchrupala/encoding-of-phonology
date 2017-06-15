@@ -64,10 +64,7 @@ def distanceMatrix(phones, vecs):
 
 def readAlignments():
     lines = list(gzip.open("../data/coco/dataset.val.fa.json.gz"))
-    jdata = []
-    for l in lines:
-        jdata.append(json.loads(l))
-    return jdata
+    return [json.loads(l) for l in lines]
 
 def getFeatureVecs(jdata, model):
     prov = dp.getDataProvider('coco', root='..', audio_kind='mfcc', load_img=False)
@@ -150,27 +147,27 @@ def phoneme_clustering():
         pactivations[l] = [activations[l][p] for p in phones]
 
     lines = list(open('phonemes.txt'))[1:]
-    gold_classes = []
-    phoneme_classes = {}
-    for line in lines:
-        cols = line.strip().split('\t')
-        if cols[2] not in gold_classes: gold_classes.append(cols[2])
-        phoneme_classes[cols[0]] = gold_classes.index(cols[2])
+    gold_classes = list(Set([l.split()[2] for l in lines]))
+    phoneme_classes = {l.split()[0]:gold_classes.index(l.split()[2]) for l in lines}
     truth_labels = [phoneme_classes[p] for p in phones]
     n_clusters = len(gold_classes)
 
     out = open('randindex.csv','wb')
     out.write("Representation ARI\n")
+
+    print(len(paudios))
     cl = cluster(paudios, n_clusters)
-    pickle.dump(phoneme_cluster, open('phoneme_cluster_audio.pkl', 'wb'))
     out.write("mfcc %2.2f\n"%(metrics.adjusted_rand_score(truth_labels, cl.labels_)))
+    pickle.dump(cl, open('phoneme_cluster_audio.pkl', 'wb'))
     
     cl = cluster(pconvacts, n_clusters)
-    pickle.dump(phoneme_cluster, open('phoneme_cluster_conv.pkl', 'wb'))
+    pickle.dump(cl, open('phoneme_cluster_conv.pkl', 'wb'))
     out.write("conv %2.2f\n"%(metrics.adjusted_rand_score(truth_labels, cl.labels_)))
 
     for l in range(layers):
         cl = cluster(pactivations[l], n_clusters)
-        pickle.dump(phoneme_cluster, open('phoneme_cluster_rec%d.pkl'%i, 'wb'))
+        pickle.dump(cl, open('phoneme_cluster_rec%d.pkl'%i, 'wb'))
         out.write("rec%d %2.2f\n"%(l,metrics.adjusted_rand_score(truth_labels, cl.labels_)))
     out.close()
+    pickle.dump(phones, open('phoneme_cluster_keys.pkl','wb'))
+    

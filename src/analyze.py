@@ -12,6 +12,7 @@ def main():
     commands.add_parser('abx_all').set_defaults(func=abx_all)
     commands.add_parser('abx_classes').set_defaults(func=abx_classes)
     commands.add_parser('clustering').set_defaults(func=clustering)
+    commands.add_parser('correlation').set_defaults(func=correlation)
     commands.add_parser('synonyms').set_defaults(func=synonyms)
     commands.add_parser('dendro').set_defaults(func=dendro)
 
@@ -38,8 +39,15 @@ def abx_classes(args):
     abx.abx_classes()
     abx.abx_cv_scores()
 
+def correlation(args):
+    logging.info("Phoneme correlation")
+    import clustering
+    clustering.phoneme_correlation()
+
 def clustering(args):
-    raise NotImplementedError
+    logging.info("Phoneme clustering")
+    import clustering
+    clustering.phoneme_clustering()
 
 def synonyms(args):
     from activations import save_activations

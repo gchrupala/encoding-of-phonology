@@ -9,7 +9,7 @@ Compute results:
 python2.7 analyze.py decoding
 ```
 
-Generate plot:
+Generate plot `../figures/decode.pdf`:
 ```
 Rscript phoneme_decode.R
 ```
@@ -22,7 +22,7 @@ Compute results:
 ```
 python2.7 analyze.py abx_all
 ```
-Results will be written in a file called abx-all.csv.
+Results will be written in the file `abx-all.csv`.
 
 
 ### Figure 2
@@ -32,7 +32,7 @@ Compute results:
 python2.7 analyze.py abx_classes
 ```
 
-Generate plot:
+Generate plot `../figures/abx_cv_same.pdf`.
 ```
 Rscript abx_classes.R
 ```
@@ -46,7 +46,7 @@ Results:
 ```
 python2.7 analyze.py correlation
 ```
-Figure:
+Figure `../figures/correlation_mfcc.pdf`.
 ```
 Rscript correlation.R
 ```
@@ -57,7 +57,7 @@ Results
 ```
 python2.7 analyze.py clustering
 ```
-
+Figure `../figures/hier_ari.pdf` and `../figures/dendro.pdf`.
 ```
 Rscript randindex.R
 python2.7 analyze.py dendro
@@ -72,7 +72,7 @@ Results:
 ```
 python2.7 analyze.py synonyms
 ```
-Figure:
+Figure `../figures/synonym.pdf`.
 ```
 Rscript synonyms.R
 ```

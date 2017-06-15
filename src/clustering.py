@@ -10,6 +10,8 @@ from sklearn import metrics
 from scipy.spatial.distance import euclidean
 import cPickle as pickle
 
+layers = 5
+
 def getTimeStep(offset, model):
     return int((offset*100 + model.config['filter_length']) // model.config['stride'])
 
@@ -73,7 +75,6 @@ def getFeatureVecs(jdata, model):
     val_states=audiovis.iter_layer_states(model, [sent['audio'].astype('float32') for sent in prov.iterSentences(split='val')])
     conv_states = audiovis.iter_conv_states(model, [sent['audio'].astype('float32') for sent in prov.iterSentences(split='val')])
 
-    layers = 5
     audios = {}
     convacts = {}
     activations = []
@@ -113,12 +114,12 @@ def getFeatureVecs(jdata, model):
     audios.pop('oov', None)
     convacts.pop('oov', None)
     for i in range(layers): activations[i].pop('oov', None)
-    return audios,convacts,pactivations
+    return audios,convacts,activations
     
 def phoneme_correlation():
     model = task.load("../models/coco-speech.zip")
     alignments = readAlignments()
-    audios,convacts,pactivations = getFeatureVecs(alignments,model)
+    audios,convacts,activations = getFeatureVecs(alignments,model)
     phones = list(audios)
     paudios = [audios[p] for p in phones]
     pconvacts = [convacts[p] for p in phones]
@@ -134,4 +135,42 @@ def phoneme_correlation():
     for l in range(layers):
         activation_matrix = distanceMatrix(phones, pactivations[l])
         out.write("rec%d %2.2f\n"%(l,numpy.corrcoef(audio_matrix, activation_matrix)[0][1]))
+    out.close()
+
+
+def phoneme_clustering():
+    model = task.load("../models/coco-speech.zip")
+    alignments = readAlignments()
+    audios,convacts,activations = getFeatureVecs(alignments,model)
+    phones = list(audios)
+    paudios = [audios[p] for p in phones]
+    pconvacts = [convacts[p] for p in phones]
+    pactivations = {}
+    for l in range(layers):
+        pactivations[l] = [activations[l][p] for p in phones]
+
+    lines = list(open('phonemes.txt'))[1:]
+    gold_classes = []
+    phoneme_classes = {}
+    for line in lines:
+        cols = line.strip().split('\t')
+        if cols[2] not in gold_classes: gold_classes.append(cols[2])
+        phoneme_classes[cols[0]] = gold_classes.index(cols[2])
+    truth_labels = [phoneme_classes[p] for p in phones]
+    n_clusters = len(gold_classes)
+
+    out = open('randindex.csv','wb')
+    out.write("Representation ARI\n")
+    cl = cluster(paudios, n_clusters)
+    pickle.dump(phoneme_cluster, open('phoneme_cluster_audio.pkl', 'wb'))
+    out.write("mfcc %2.2f\n"%(metrics.adjusted_rand_score(truth_labels, cl.labels_)))
+    
+    cl = cluster(pconvacts, n_clusters)
+    pickle.dump(phoneme_cluster, open('phoneme_cluster_conv.pkl', 'wb'))
+    out.write("conv %2.2f\n"%(metrics.adjusted_rand_score(truth_labels, cl.labels_)))
+
+    for l in range(layers):
+        cl = cluster(pactivations[l], n_clusters)
+        pickle.dump(phoneme_cluster, open('phoneme_cluster_rec%d.pkl'%i, 'wb'))
+        out.write("rec%d %2.2f\n"%(l,metrics.adjusted_rand_score(truth_labels, cl.labels_)))
     out.close()

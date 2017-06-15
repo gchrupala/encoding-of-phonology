@@ -9,8 +9,8 @@ def main():
     parser = argparse.ArgumentParser()
     commands = parser.add_subparsers()
     commands.add_parser('decoding').set_defaults(func=decoding)
-    commands.add_parser('abx-all').set_defaults(func=abx_allitems)
-    commands.add_parser('abx-classes').set_defaults(func=abx_perclass)
+    commands.add_parser('abx_all').set_defaults(func=abx_all)
+    commands.add_parser('abx_classes').set_defaults(func=abx_classes)
     commands.add_parser('clustering').set_defaults(func=clustering)
     commands.add_parser('synonyms').set_defaults(func=synonyms)
 
@@ -26,15 +26,16 @@ def decoding(args):
     from bootstrap import bootstrap
     bootstrap()
 
-def abx_allitems(args):
+def abx_all(args):
     logging.info("ABX task - all syllables")
-    from abx import abx_all
-    abx_all()
+    import abx
+    abx.abx_all()
 
-def abx_perclass(args):
+def abx_classes(args):
     logging.info("ABX task - divided by phoneme class")
-    from abx import abx_classes
-    abx_classes()
+    import abx
+    abx.abx_classes()
+    abx.abx_cv_scores()
 
 def clustering(args):
     raise NotImplementedError

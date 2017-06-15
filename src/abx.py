@@ -3,6 +3,7 @@ from audio import load_audio, extract_mfcc
 from activations import save_activations
 from sets import Set
 from scipy.spatial.distance import euclidean
+import logging
 
 datadir = "../data/coco/"
 
@@ -127,7 +128,7 @@ def abx_classes():
         syllables = [l.lower().split()[0]+'_'+l.lower().split()[1] for l in lines if l[0] != '#']
         all_syllables = Set(syllables)
         items = prepareItems(all_syllables)
-        numpy.save(open('abx_items.npy','wb'), items)
+        numpy.save(open('abx_cv_items.npy','wb'), items)
 
         
         audios = list(load_audio(words, datadir+"abx_cv/"))
@@ -140,13 +141,13 @@ def abx_classes():
 
         f = dict(zip(syllables, [extract_mfcc(a) for a in audios]))
         diff = [distance(audiovec(a,f),audiovec(x,f)) - distance(audiovec(b,f),audiovec(x,f)) for (a,b,x) in items]
-        numpy.save(open('abx_audio.npy', 'wb'), diff)
+        numpy.save(open('abx_cv_audio.npy', 'wb'), diff)
         accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
         out.write("mfcc,"+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
 
         f = dict(zip(syllables,numpy.load(datadir+"abx-conv_states.npy")))
         diff = [distance(convvec(a,f),convvec(x,f)) - distance(convvec(b,f),convvec(x,f)) for (a,b,x) in items]
-        numpy.save(open('abx_convolution.npy', 'wb'), diff)
+        numpy.save(open('abx_cv_conv.npy', 'wb'), diff)
         accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
         out.write("convolution,"+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
 
@@ -155,15 +156,65 @@ def abx_classes():
         f = dict(zip(syllables, f))
         for l in range(layers):
                 diff = [distance(layervec(a,l,f),layervec(x,l,f)) - distance(layervec(b,l,f),layervec(x,l,f)) for (a,b,x) in items]
-                numpy.save(open('abx_activations'+str(l)+'.npy', 'wb'), diff)                    
+                numpy.save(open('abx_cv_activations'+str(l)+'.npy', 'wb'), diff)                    
                 accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
                 out.write("recurrent %d,"%l+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
 
         f = dict(zip(syllables,numpy.load(datadir+"abx-embeddings.npy")))
         diff = [distance(embvec(a,f),embvec(x,f)) - distance(embvec(b,f),embvec(x,f)) for (a,b,x) in items]
-        numpy.save(open('abx_embeddings.npy', 'wb'), diff)
+        numpy.save(open('abx_cv_embeddings.npy', 'wb'), diff)
         accuracies = getClassAccuracies(getClassDiffs(items, diff, phoneme_classes, gold_classes),gold_classes)
         out.write("embeddings,"+(''.join("%2.2f,"%accuracies[c] for c in range(len(gold_classes))))+'\n')
                     
         out.close()
+
+def abx_cv_scores():
+    logging.info("Computing per-class scores")
+    def parse(line):
+        arpa, ipa, klass = line.split()
+        return (arpa, ipa, klass)
+   
+    ipa2class = dict(parse(line)[1:3] for line in open("phonemes.txt"))
+    def klass(ipa):
+        return ipa2class[ipa]
+    items = numpy.load("abx_cv_items.npy")
+    scores = dict(
+        mfcc = numpy.load("abx_cv_audio.npy"),
+        conv = numpy.load("abx_cv_conv.npy"),
+        rec1 = numpy.load("abx_cv_activations0.npy"),
+        rec2 = numpy.load("abx_cv_activations1.npy"),
+        rec3 = numpy.load("abx_cv_activations2.npy"),
+        rec4 = numpy.load("abx_cv_activations3.npy"),
+        rec5 = numpy.load("abx_cv_activations4.npy")
+        # ,emb  = numpy.load("abx_cv_embeddings.npy")
+        )
+    with open("abx_cv_scores.txt",'w') as out:
+        out.write("repr ac av bc bv xc xv target distractor target_c distractor_c score\n")
+
+        for i,item in enumerate(items):
+            a, b, x = item
+            ac, av = a.split('_')
+            bc, bv = b.split('_')
+            xc, xv = x.split('_')
+            # FIX eI vs e
+            if xc == bc:
+                mode = 'C'
+                target = xc
+                distractor = ac
+            elif xv == bv:
+                mode = 'V'
+                target = xv
+                distractor = av
+            else:
+                raise ValueError("No target")
+            for key in scores:
+                try:
+                    out.write("{} {} {} {} {} {} {} {} {} {} {} {}\n".format(
+                        key, ac, av, bc, bv, xc, xv, target, distractor, 
+                        klass(target), klass(distractor), scores[key][i]))
+                except KeyError:
+                    print "Wrong item: {} {} {}".format(a,b,x)
+
+
                                                                                                                                                         
+

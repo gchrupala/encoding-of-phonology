@@ -1,0 +1,72 @@
+\section{Introduction}
+\label{sec:intro}
+
+Spoken language is a universal human means of communication. As such,
+its acquisition and representation in the brain is an
+essential topic in the study of the cognition of our species.
+In the field of neuroscience there has been a long-standing interest
+in the understanding of neural representations of linguistic input in
+human brains, most commonly via the analysis of neuro-imaging data of
+participants exposed to simplified, highly controlled inputs. More recently, 
+naturalistic data has been used and patterns in the brain have been correlated with 
+patterns in the input
+\citep[e.g.][]{wehbe2014simultaneously,khalighinejad2017dynamic}. 
+
+This type of approach is relevant also when the goal is the understanding
+of the dynamics in complex neural network models of speech understanding. 
+Firstly because similar techniques are often applicable, but more importantly 
+because the knowledge of how the workings of artificial and biological neural
+networks are similar or different is valuable for the general enterprise
+of cognitive science.
+
+Recent studies have implemented models which learn to understand
+speech in a weakly and indirectly supervised fashion from correlated
+audio and visual signal:
+\citet{harwath2016unsupervised,harwath2017learning,chrupala2017representations}. This
+is a departure from typical Automatic Speech Recognition (ASR) systems
+which rely on large amounts of transcribed speech, and these recent
+models come closer to the way humans acquire language in a grounded
+setting. It is thus especially interesting to investigate to what extent the
+traditional levels of linguistic analysis such as phonology,
+morphology, syntax and semantics are encoded in the activations of
+the hidden layers of these models. There are a small number of
+studies which focus on the syntax and/or semantics in the context of
+neural models of written language
+\citep[e.g.][]{elman1991distributed,frank2013acquisition,Kdr2016RepresentationOL,
+li2016visualizing,adi2016fine,DBLP:journals/corr/LiMJ16a,TACL972}.
+% 
+Taking it a step further, \citet{gelderloos2016from} and \citet{chrupala2017representations} 
+investigate the levels of representations in models which learn
+language from phonetic transcriptions and from the speech signal,
+respectively. Neither of these tackles the representation of phonology
+in any great depth. Instead they work with relatively coarse-grained
+distinctions between form and meaning.
+
+In the current work we use controlled synthetic stimuli,
+as well as  alignment between the audio signal and phonetic
+transcription of spoken utterances to extract phoneme 
+representation vectors based on the activations on the hidden 
+layers of a model of grounded speech perception. We use these 
+representations to carry out analyses of the representation of phonemes 
+ at a fine-grained level. In a series of experiments, we show that 
+ the lower layers of the model encode accurate representations 
+ of the phonemes which can be used in phoneme identification and 
+ classification with high accuracy. We further investigate how the 
+ phoneme inventory is organised in the activation space of the 
+ model. Finally, we tackle the general issue of the representation 
+ of phonological form versus meaning with a controlled task of 
+ synonym discrimination.
+ 
+Our results show that the bottom layers in the multi-layer recurrent
+neural network learn invariances which enable it to encode phonemes
+independently of co-articulatory context, and that they represent
+ phonemic categories closely matching usual classifications from
+ linguistics. Phonological form becomes harder to detect in
+ higher layers of the network, which increasingly focus on
+ representing meaning over form, but encoding of phonology persists 
+ to a significant degree up to the top recurrent layer.
+
+We make the data and open-source code to reproduce our results publicly
+available at
+\href{https://github.com/gchrupala/encoding-of-phonology}{github.com/gchrupala/encoding-of-phonology}.
+

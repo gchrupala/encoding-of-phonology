@@ -1,0 +1,73 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[hyperref]{acl2017}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{tipa}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{breqn}
+\usepackage{todonotes}
+\usepackage{arydshln}
+\usepackage{enumitem}
+\setlist{nolistsep}
+
+\aclfinalcopy
+
+\title{Encoding of phonology in a recurrent neural model of grounded speech} 
+
+\author{
+  Afra Alishahi\\
+  Tilburg University\\
+  {\tt a.alishahi@uvt.nl}
+  \And Marie Barking\\
+  Tilburg University\\
+  {\tt m.barking@uvt.nl}
+ \And Grzegorz Chrupała\\
+  Tilburg University\\
+  {\tt g.chrupala@uvt.nl}}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+  We study the representation and encoding of phonemes in a recurrent
+  neural network model of grounded speech. We use a model which
+  processes images and their spoken descriptions, and projects the
+  visual and auditory representations into the same semantic space. We
+  perform a number of analyses on how information about individual
+  phonemes is encoded in the MFCC features extracted from the speech
+  signal, and the activations of the layers of the model. Via
+  experiments with phoneme decoding and phoneme discrimination we show
+  that phoneme representations are most salient in the lower layers of
+  the model, where low-level signals are processed at a fine-grained
+  level, although a large amount of phonological information is retain at
+  the top recurrent layer. We further find out that the
+  attention mechanism following the top recurrent layer significantly
+  attenuates encoding of phonology and makes the utterance embeddings
+  much more invariant to synonymy. Moreover, a hierarchical clustering
+  of phoneme representations learned by the network shows an
+  organizational structure of phonemes similar to those proposed in
+  linguistics.
+\end{abstract}
+
+
+\input{intro.tex}
+\input{related.tex}
+\input{models.tex}
+\input{experiments.tex}
+\input{discussion.tex}
+
+
+\bibliographystyle{acl_natbib}
+\bibliography{biblio}
+\appendix
+
+
+\end{document}

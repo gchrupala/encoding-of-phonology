@@ -1,0 +1,133 @@
+\section{Related Work}
+\label{sec:related}
+Research on encoding of phonology has been carried out from a 
+psycholinguistics as well as computational modeling perspectives. Below we review
+both types of work.
+\subsection{Phoneme perception}
+\label{sec:phoneme-perception}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Phoneme perception
+Co-articulation and interspeaker variability make it impossible to
+define unique acoustic patterns for each phoneme. In an early
+experiment, \citet{liberman1967perception}
+analyzed the acoustic properties of the /d/ sound in the two syllables
+/di/ and /du/. They found that while humans easily noticed differences
+between the two instances when /d/  was played in
+isolation, they perceived the /d/ as being the same when 
+listening to the complete syllables. This phenomenon
+is often referred to as categorical perception: acoustically different stimuli 
+are perceived as the same. In another experiment \citet{lisker1967} used 
+the two syllables /ba/ and /pa/ which only differ in their 
+{\it voice onset time} (VOT), 
+%and created a intermediates between the two syllables 
+%by smoothly varying VOT. Participants clearly
+%identified the consonant with VOT below 25 msec 
+and created a continuum moving from syllables with short VOT 
+to syllables with increasingly longer VOT. Participants identified all consonants 
+with VOT below 25 msec as being /b/ and all
+consonant with VOT above 25 msec as being /p/. There was no grey area in which both interpretations of the sound were equally likely, which suggests that the phonemes were perceived categorically.
+Supporting findings also come from discrimination experiments: when one consonant has a VOT below 25 msec and the other above, people perceive the two syllables as being different (/ba/ and /pa/ respectively), but they do not notice any differences in the acoustic signal when both syllables have a VOT below or above 25 msec (even when these sounds are physically further away from each other than two sounds that cross the 25 msec dividing line). 
+%Supporting findings also come
+%from discrimination experiments: while people clearly discriminate
+%between /b/ and /p/ when the two acoustic forms come from both sides
+%of the 25 msec dividing line, they do not notice any differences
+%between acoustic forms from the same side, even when these sounds are
+%closer together physically than two sounds from different sides of the
+%dividing line. 
+
+Evidence from infant speech perception studies suggests that infants
+also perceive phonemes categorically  \citep{eimas1971speech}: one-
+and four-month old infants were presented with multiple syllables from
+the continuum of /ba/ to /pa/ sounds described above. As long as the
+syllables all came from above or below the 25 msec line, the infants
+showed no change in behavior (measured by their amount of sucking),
+but when presented with a syllable crossing that line, the infants
+reacted differently. This suggests that infants, just like adults, perceive speech sounds as belonging to discrete categories. \citet{dehaene2004common} also showed that the same neural systems are activated for both infants and adults when performing this task.
+%Studies of infants show that they also perceive
+%phonemes categorically  \citep{eimas1971speech}. 
+%\citet{dehaene2004common} showed that
+%the same neural systems are activated for phoneme discrimination in
+%children and adults.  
+
+Importantly, languages differ in their phoneme inventories; for example English distinguishes /r/ from /l/ while Japanese does not, and children have to learn which categories to use. Experimental evidence suggests that infants can discriminate both native and nonnative speech sound differences up to 8 months of age, but have difficulty discriminating acoustically similar nonnative contrasts by 10-12 months of age \citep{werker2015critical}. These findings suggest that by their first birthday, they have learned to focus only on those contrasts that are relevant for their native language and to neglect those which are not. Psycholinguistic theories assume that children learn the categories of their native language by keeping track of the frequency distribution of acoustic sounds in their input. The forms around peaks in this distribution are then perceived as being a distinct category. Recent computational models showed that infant-directed speech contains sufficiently clear peaks for such a distributional learning mechanism to succeed and also that top-down processes like semantic knowledge and visual information play a role in phonetic category learning \citep{ter2016semantics}.
+
+%However, languages differ in their phoneme
+%inventories, for example, English distinguishes /r/ from /l/ while
+%Japanese does not. Experimental evidence suggests that up to 8 months
+%of age, infants reliably discriminate both native and nonnative speech
+%sound differences, but by 10–12 months of age, they have difficulty
+%discriminating acoustically similar nonnative contrasts \citep{werker2015critical}.Psycholinguistic theories assume that
+%children keep track of the frequency distribution in their input so
+%that phonemes around peaks in this distribution are perceived as being
+%a distinct category. Recent computational models showed that
+%infant-directed speech contains sufficiently clear peaks for such a
+%distributional learning mechanism to succeed and also that top-down processes
+%like semantic knowledge and visual information play a role in phonetic
+%category learning \citep{ter2016semantics}.
+
+From the machine learning perspective categorical perception
+corresponds to the notion of learning invariances to certain
+properties of the input. With the experiments in
+Section~\ref{sec:experiments} we attempt to gain some insight into this issue.
+
+%------------------
+\subsection{Computational models}
+\label{sec:computational}
+There is a sizeable body of work on using recurrent neural (and other)
+networks to detect phonemes or phonetic features as a subcomponent of
+an ASR system. 
+\citet{KING2000333} train recurrent neural networks to extract
+phonological features from framewise cepstral representation of speech
+in the TIMIT speaker-independent
+database. 
+\citet{frankel2007articulatory} introduce a dynamic Bayesian network
+for articulatory (phonetic) feature recognition as a component of an ASR system.
+%\citet{sroka2005human} ...
+\citet{Siniscalchi2013148} show that a multilayer perceptron can 
+successfully classify phonological features and contribute to the
+accuracy of a downstream ASR system.
+
+\citet{mohamed2012understanding} use a Deep Belief Network (DBN) for 
+acoustic modeling and phone recognition on human speech. They analyze 
+the impact of the number of layers on phone recognition error rate, and 
+visualize the MFCC vectors as well as the learned activation vectors 
+of the hidden layers of the model. They show that the representations learned 
+by the model are more speaker-invariant than the MFCC features. 
+
+These works directly supervise  the networks to recognize phonological
+information. Another supervised but multimodal approach is taken by 
+\citet{sun2016speech}, which uses grounded speech for improving a 
+supervised model of transcribing utterances from 
+spoken description of images. We on the other hand are more interested 
+in understanding how the phonological level of representation emerges 
+from weak supervision via correlated signal from the visual modality.
+
+There are some existing models which learn language representations from sensory 
+input in such a weakly supervised fashion. For example \citet{Roy2002113} use 
+spoken utterances paired with images of objects, and search for segments 
+of speech that reliably co-occur with visual shapes. \citet{yu2004multimodal} 
+use a similar approach but also include non-verbal cues such as gaze and 
+gesture into the input for unsupervised learning of words and their visual 
+meaning. These language learning models use rich input signals, but are 
+very limited in scale and variation. 
+
+A separate line of research has used neural networks for modeling
+phonology from a (neuro)-cognitive perspective.
+\citet{burgess1999memory} implement a connectionist model of the
+so-called phonological loop, i.e.\ the posited working memory which
+makes phonological forms available for recall
+\citep{baddeley1974working}.  \citet{gasser1989networks} show that
+Simple Recurrent Networks are capable of acquiring phonological
+constraints such as vowel harmony or phonological alterations at
+morpheme boundaries. \citet{touretzky1989computational} present a
+connectionist architecture which performs multiple simultaneous insertion,
+deletion, and mutation operations on sequences of phonemes. In this body of
+work the input to the network is at the level of phonemes or phonetic
+features, not acoustic features, and it is thus more concerned with the
+rules governing phonology and does not address how representations of
+phonemes arise from exposure to speech in the first place. Moreover,
+the early connectionist work deals with constrained, 
+toy datasets. Current neural network architectures and hardware enable us
+to use much more realistic inputs with the potential to lead to
+qualitatively different results.
+
+

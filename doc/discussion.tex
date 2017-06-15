@@ -1,0 +1,43 @@
+\section{Discussion}
+\label{sec:conclusion}
+Understanding distributed representations learned by neural networks
+is important but has the reputation of being hard or even impossible. In
+this work we focus on making progress on this problem for a particular
+domain: representations of phonology in a multilayer recurrent neural network
+trained on grounded speech signal. We believe it is important to
+carry out multiple analyses using diverse methodology: any single
+experiment may be misleading as it depends on analytical choices such
+as the type of supervised model used for decoding, the algorithm used
+for clustering, or the similarity metric for representational
+similarity analysis. To the extent that more than one experiment
+points to the same conclusion our confidence in the reliability of the
+insights gained will be increased.
+
+Earlier work \cite{chrupala2017representations} 
+shows that encoding of semantics in our RNN model of grounded speech 
+becomes stronger in higher layers, while encoding of form becomes weaker.
+The main high-level results of our study confirm this pattern by showing that 
+the representation of phonological knowledge is most accurate in the lower
+layers of the model. This general pattern is to be expected as the
+objective of the utterance encoder is to transform the input acoustic
+features in such a way that it can be matched to its counterpart in a
+completely separate modality. Many of the details of how this happens,
+however, are far from obvious: perhaps most surprisingly we found that
+a large amount of phonological information is still available up to the top
+recurrent layer. Evidence for this pattern emerges from the phoneme
+decoding task, the ABX task and the synonym discrimination task. The
+last one also shows that the attention layer filters out and
+significantly attenuates encoding of phonology and makes the utterance
+embeddings much more invariant to synonymy.
+
+Our model is trained on synthetic speech, which is easier to process than 
+natural human-generated speech. While small-scale databases of natural 
+speech and image are available \citep[e.g.\ the Flickr8k Audio Caption
+Corpus,][]{harwath2015deep}, they are not large enough to reliably
+train models such as ours. 
+In future we would like to collect more data and apply our methodology to grounded 
+human speech and investigate whether context and speaker-invariant phoneme 
+representations can be learned from natural, noisy input. We would also like to make
+comparisons to the results that emerge from similar analyses
+applied to neuroimaging data.
+  

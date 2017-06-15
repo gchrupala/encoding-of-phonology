@@ -1,0 +1,54 @@
+\section{Model}
+\label{sec:model}
+As our model of language acquisition from grounded speech signal we
+adopt the Recurrent Highway Network-based model
+of \citet{chrupala2017representations}. This model has two
+desirable properties: firstly, thanks to the analyses carried in 
+that work, we understand roughly how the
+hidden layers differ in terms of the level of linguistic
+representation they encode. Secondly, the model is trained on clean
+synthetic speech which makes it appropriate to use for the controlled
+experiments in Section~\ref{sec:abx}.
+We refer the reader to \citet{chrupala2017representations} for a
+detailed description of the model architecture. Here we give a brief
+overview.
+
+The model exploits correlations between two modalities, i.e.\ speech
+and vision, as a source of weak supervision for learning to understand
+speech; in other words it implements language acquisition from the
+speech signal grounded in visual perception.  The architecture is a
+bi-modal network whose learning objective is to project spoken
+utterances and images to a joint semantic space, such that
+corresponding pairs $(u,i)$ (i.e.\ an utterance and the image it
+describes) are close in this space, while unrelated pairs are far
+away, by a margin $\alpha$:
+\begin{dmath}
+  \sum_{u,i} \left(\sum_{u'} \max[0, \alpha + d(u,i) - d(u',i)] +
+    \sum_{i'} \max[0, \alpha + d(u,i) - d(u,i')] \right)
+\end{dmath}
+where $d(u,i)$ is the cosine distance between the encoded utterance $u$
+and encoded image $i$.
+
+The image encoder part of the model uses image vectors from a
+pretrained object classification model, VGG-16 \citep{simonyan2014very}, and uses a linear
+transform to directly project these to the joint space.
+The utterance encoder takes Mel-frequency Cepstral Coefficients (MFCC)
+as input, and transforms it successively according to:
+\begin{equation}
+  \label{eq:encode_u}
+  \mathrm{enc}_u(\mathbf{u}) = \mathrm{unit}(\mathrm{Attn}(\mathrm{RHN}_{k,L} (\mathrm{Conv}_{s,d,z}(\mathbf{u}))))
+\end{equation}
+The first layer $\mathrm{Conv}_{s,d,z}$ is a one-dimensional
+convolution of size $s$ which subsamples the input with stride $z$,
+and projects it to $d$ dimensions. It is followed by
+$\mathrm{RHN}_{k,L}$ which consists of $k$ residualized recurrent
+layers. Specifically these are Recurrent Highway Network layers
+\citep{zilly2016recurrent}, which are closely related to GRU networks,
+with the crucial difference that they increase the depth of the
+transform between timesteps; this is the recurrence depth $L$. The
+output of the final recurrent layer is passed through an
+attention-like lookback operator $\mathrm{Attn}$ which takes a
+weighted average of the activations across time steps. Finally,
+both utterance and image projections are L2-normalized. See
+Section~\ref{sec:parameters} for details of the model configuration.
+

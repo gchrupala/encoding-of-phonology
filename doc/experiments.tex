@@ -1,0 +1,99 @@
+\section{Experimental data and setup}
+\label{sec:experiments}
+The phoneme representations in each layer are calculated as the
+activations averaged over the duration of the phoneme occurrence in the
+input. The average input vectors are similarly calculated as the MFCC
+vectors averaged over the time course of the articulation of the
+phoneme occurrence. When we need to represent a phoneme type we do so by
+averaging the vectors of all its occurrences in the validation set.
+\begin{table}[t]
+  \centering
+  \begin{tabular}{l|c}
+    Vowels & \textipa{i I U u}\\
+           & \textipa{e E \textschwa{} \textrhookschwa{} OI O o }
+             \\
+           & \textipa{aI \ae{} \textturnv{} \textscripta{}  aU }\\
+    Approximants & \textipa{j \textturnr{} l w }\\
+    Nasals      & \textipa{m n N } \\
+    Plosives   & \textipa{p  b  t  d  k  g }\\
+    Fricatives & \textipa{f v T \dh{} s z S Z h }\\
+    Affricates & \textipa{\textteshlig{} \textdyoghlig{} }\\
+  \end{tabular}
+  \caption{Phonemes of General American English.}
+  \label{tab:phoneme-list}
+\end{table}
+Table~\ref{tab:phoneme-list} shows the phoneme inventory we work with; this is also the inventory used by Gentle/Kaldi (see Section~\ref{sec:forced}).
+
+
+\subsection{Model settings}
+\label{sec:parameters}
+We use the pre-trained version of the COCO~Speech model, implemented
+in Theano \citep{Bastien-Theano-2012}, provided by
+\citet{chrupala2017representations}.\footnote{Code, data and
+  pretrained models available from \href{https://github.com/gchrupala/visually-grounded-speech}{https://github.com/gchrupala/visually-grounded-speech}.}
+The details of the model configuration are as follows: convolutional
+layer with length 6, size 64, stride 3, 5 Recurrent Highway Network
+layers with 512 dimensions and 2 microsteps, attention Multi-Layer
+Perceptron with 512 hidden units, Adam optimizer, initial learning
+rate 0.0002. The 4096-dimensional image feature vectors come from the
+final fully connect layer of VGG-16 \citep{simonyan2014very}
+pre-trained on Imagenet \cite{ILSVRCarxiv14}, and are averages of
+feature vectors for ten crops of each image.  The total number of
+learnable parameters is 9,784,193. Table~\ref{tab:arch} sketches the
+architecture of the utterance encoder part of the model.
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{|c|}\hline
+    Attention: size 512 \\\hline
+    Recurrent 5: size 512 \\\hline
+    Recurrent 4: size 512 \\\hline
+    Recurrent 3: size 512 \\\hline
+    Recurrent 2: size 512 \\\hline
+    Recurrent 1: size 512 \\\hline
+    Convolutional: size 64, length 6, stride 3 \\\hline\hline
+    Input MFCC: size 13 \\\hline
+  \end{tabular}
+  \caption{COCO~Speech utterance encoder architecture.}
+  \label{tab:arch}
+\end{table}
+
+\subsection{Synthetically Spoken COCO}
+\label{sec:coco}
+The Speech~COCO model was trained on the Synthetically Spoken COCO dataset \citep{grzegorz_chrupala_2017_400926}, which is a version of the MS~COCO dataset \citep{lin2014microsoft} where speech was synthesized for the original image descriptions, using high-quality speech synthesis provided by gTTS.\footnote{Available at \href{https://github.com/pndurette/gTTS}{https://github.com/pndurette/gTTS}.}
+
+\subsection{Forced alignment}
+\label{sec:forced}
+We aligned the speech signal to the corresponding phonemic transcription with the Gentle toolkit,\footnote{Available at
+  \href{https://github.com/lowerquality/gentle}{https://github.com/lowerquality/gentle}.}
+which in turn is based on Kaldi \citep{Povey_ASRU2011}. It 
+uses a speech recognition model for English to transcribe the input audio
+signal, and then finds the optimal alignment of the transcription to
+the signal. This fails for a small number of utterances, which we
+remove from the data.  In the next step we extract MFCC features from
+the audio signal and pass them through the COCO~Speech utterance encoder, and
+record the activations for the convolutional layer as well as all the
+recurrent layers. For each utterance the representations (i.e.\ MFCC
+features and activations) are stored in a $t_r\times D_r$ matrix, where
+$t_r$ and $D_r$ are the number of times steps and the dimensionality,
+respectively, for each representation $r$. Given the alignment of each
+phoneme token to the underlying audio, we then infer the slice of the
+representation matrix corresponding to it.
+
+\section{Experiments}
+In this section we report on four experiments which we designed to
+elucidate to what extent information about phonology is represented in
+the activations of the layers of the COCO~Speech model. In
+Section~\ref{sec:decoding} we quantify how easy it is to decode phoneme
+identity from activations. In Section~\ref{sec:abx} we determine
+phoneme discriminability in a controlled task with minimal pair
+stimuli. Section~\ref{sec:organization} shows how the phoneme
+inventory is organized in the activation space of the model. Finally,
+in Section~\ref{sec:synonym} we tackle the general issue of the
+representation of phonological form versus meaning with the controlled
+task of synonym discrimination.
+
+\input{decoding}
+\input{abx_task}
+\input{clustering}
+\input{synonyms}

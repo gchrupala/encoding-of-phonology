@@ -20,7 +20,7 @@ Rscript phoneme_decode.R
 
 Compute results:
 ```
-python2.7 analyze.py abx-all
+python2.7 analyze.py abx_all
 ```
 Results will be written in a file called abx-all.csv.
 
@@ -29,12 +29,12 @@ Results will be written in a file called abx-all.csv.
 
 Compute results:
 ```
-python2.7 analyze.py abx-classes
+python2.7 analyze.py abx_classes
 ```
 
 Generate plot:
 ```
-Rscript ???.R
+Rscript abx_classes.R
 ```
 
 

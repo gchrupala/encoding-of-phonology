@@ -17,7 +17,7 @@ the task is to identify which of the two syllables /bi/ or /mi/ is closer to /\t
 measure context invariance in phoneme discrimination by evaluating how often the model 
 recognizes $X$ as the syllable closer to $B$ than to $A$.
 
-\begin{table}
+\begin{table}[hb]
  \centering
  \caption{Accuracy of choosing the correct target in an ABX task using different 
  representations.}
@@ -62,6 +62,7 @@ further up in the model. The accuracy is lowest when final embedding features ar
 
 \begin{figure}[t]
   \centering
+  \vskip -0.35cm
   \includegraphics[scale=0.3]{figures/abx_cv_same.pdf}
   \caption{Accuracies for the ABX CV task for the cases where the target
     and the distractor belong to the same phoneme class. Shaded area
